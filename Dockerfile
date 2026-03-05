@@ -4,13 +4,13 @@ FROM oven/bun:1 AS builder
 WORKDIR /app
 
 # Copiamos archivos de dependencias
-COPY apps/web/package.json ./
+COPY package.json ./
 
 # Instalamos dependencias
 RUN bun install
 
 # Copiamos el código fuente
-COPY apps/web/ .
+COPY . .
 
 # Construimos la aplicación (ahora genera output: 'standalone')
 RUN bun run build
