@@ -76,11 +76,8 @@ export default async function CreatorProfilePage({ params }) {
         <ProfileTabs
           askForm={
             <div className="bg-[#0f0f0f] p-8 rounded-3xl border border-zinc-800 relative overflow-hidden">
-              <div className="text-center mb-10">
-                <h2 className="text-xl font-bold text-white mb-2">Ask a Question</h2>
-                <p className="text-zinc-400 text-sm max-w-sm mx-auto">
-                  Sent anonymously. If rejected or ignored, logic applies depending on payments.
-                </p>
+              <div className="text-center">
+                <h2 className="text-xl font-bold text-white mb-2">Ask a anonymous Question</h2>
               </div>
 
               {acceptsPayments ? (
