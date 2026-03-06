@@ -116,6 +116,7 @@ export default function RegisterPage() {
               <button
                 type="submit"
                 disabled={loading}
+                data-umami-event="register"
                 className="flex w-full justify-center bg-white px-3 py-3 text-sm font-semibold text-black rounded-full hover:bg-zinc-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white disabled:opacity-50 transition-colors"
               >
                 {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : "Sign up"}

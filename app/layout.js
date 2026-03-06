@@ -14,6 +14,11 @@ export default function RootLayout({ children }) {
   return (
     <html lang="en">
       <body className={`${inter.className} min-h-screen bg-black text-white antialiased`}>
+        <Script
+          defer={true}
+          src="https://analytics.unsetsoft.com/script.js"
+          data-website-id="04684cee-f545-42d1-97c9-cfe5632ad47d"
+        />
         <AuthProvider>
           {children}
         </AuthProvider>
