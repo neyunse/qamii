@@ -53,8 +53,11 @@ export async function POST(req) {
       status: 'pending',
     });
 
-    // Initialize MP SDK with creator's OAuth access token
-    const client = new MercadoPagoConfig({ accessToken: creator.mercadopago.access_token });
+    // Use the PLATFORM's access token to create the preference.
+    // Using the seller's OAuth token causes cross-country checkout crashes
+    // (e.g., AR app token + MX seller = fatal error on mercadopago.com.mx).
+    // collector_id routes the payment to the correct seller's MP account.
+    const client = new MercadoPagoConfig({ accessToken: process.env.MP_ACCESS_TOKEN });
 
     const preferenceClient = new Preference(client);
 
@@ -63,9 +66,6 @@ export async function POST(req) {
       title: `Question for @${creator.username}`,
       unit_price: Number(amount),
       quantity: 1,
-      // Do NOT send currency_id — MercadoPago determines the currency
-      // from the seller's access token country. Sending a mismatched
-      // currency_id (e.g. ARS for a Mexican seller) breaks the checkout.
     };
 
     if (avatarFullUrl) {
@@ -77,6 +77,8 @@ export async function POST(req) {
       metadata: {
         question_id: question._id.toString(),
       },
+      collector_id: Number(creator.mercadopago.user_id), // Route payment to this seller
+      marketplace_fee: platformFee, // Platform commission — works with platform token + collector_id
       statement_descriptor: "QAmii",
       back_urls: {
         success: `${process.env.APP_URL}/${creator.username}?success=true`,
