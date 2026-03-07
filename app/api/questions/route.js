@@ -87,18 +87,7 @@ export async function POST(req) {
       notification_url: `${process.env.APP_URL}/api/mp/webhook`,
     };
 
-    let preference;
-    try {
-      // Try with marketplace_fee first (works when platform app is registered in seller's country)
-      preference = await preferenceClient.create({
-        body: { ...preferenceBody, marketplace_fee: platformFee }
-      });
-    } catch (mpError) {
-      // marketplace_fee may fail for sellers in countries where the platform app isn't registered
-      // as a marketplace. Retry without it — fee is still tracked in our DB.
-      console.warn("marketplace_fee failed, retrying without it:", mpError.message || mpError);
-      preference = await preferenceClient.create({ body: preferenceBody });
-    }
+    const preference = await preferenceClient.create({ body: preferenceBody });
 
     return NextResponse.json({ init_point: preference.init_point }, { status: 200 });
 
