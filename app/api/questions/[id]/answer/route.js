@@ -19,7 +19,7 @@ export async function PUT(req, { params }) {
     const id = unwrappedParams.id;
 
     if (!answer) {
-      return NextResponse.json({ message: "Answer content provides" }, { status: 400 });
+      return NextResponse.json({ message: "Answer content is required" }, { status: 400 });
     }
 
     await connectToDatabase();

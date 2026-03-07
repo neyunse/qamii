@@ -5,6 +5,7 @@ import User from "@/models/User";
 import IntegrationsClient from "./IntegrationsClient";
 import { redirect } from "next/navigation";
 import { Plug } from "lucide-react";
+import crypto from "crypto";
 
 export default async function IntegrationsPage() {
   const session = await getServerSession(authOptions);
@@ -22,7 +23,7 @@ export default async function IntegrationsPage() {
 
   // Ensure OBS key exists for older users, though our new register hook covers new ones
   if (!user.integrations?.obsKey) {
-    const crypto = require("crypto");
+
     if (!user.integrations) user.integrations = {};
     user.integrations.obsKey = crypto.randomBytes(16).toString("hex");
     await user.save();

@@ -8,7 +8,7 @@ import { sendNewQuestionEmail } from "@/lib/mail";
 export async function POST(req) {
   try {
     const url = new URL(req.url);
-    const dataId = url.searchParams.get("data.id") || req.body?.data?.id;
+    const dataId = url.searchParams.get("data.id");
     let body;
 
     try {

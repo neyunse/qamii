@@ -8,7 +8,7 @@ import { getImageUrl } from "@/lib/r2";
 
 export async function POST(req) {
   try {
-    const { username, content, amount, currency } = await req.json();
+    const { username, content, amount, currency, fanEmail } = await req.json();
 
     if (!username || !content || !amount || amount < 1 || !currency || !SUPPORTED_CURRENCIES.includes(currency)) {
       return NextResponse.json({ message: "Invalid request data or unsupported currency" }, { status: 400 });
@@ -47,6 +47,7 @@ export async function POST(req) {
       content,
       amount,
       currency,
+      fanEmail: fanEmail || undefined,
       platformFeePercentage: feePercentage,
       feeAmount: platformFee,
       status: 'pending',
