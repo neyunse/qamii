@@ -2,12 +2,34 @@ import Link from 'next/link';
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { CURRENCY_MAP } from "@/lib/constants";
+import { Users, Dices } from "lucide-react";
+import connectToDatabase from "@/lib/db";
+import User from "@/models/User";
 
 export default async function Home() {
   const session = await getServerSession(authOptions);
 
+  let hasCreators = false;
+  try {
+    await connectToDatabase();
+    hasCreators = await User.exists({ "mercadopago.access_token": { $exists: true, $ne: null } });
+  } catch { }
+
   return (
-    <div className="bg-black min-h-screen selection:bg-white selection:text-black">
+    <div className="bg-black min-h-screen selection:bg-white selection:text-black relative">
+      {/* Floating Explore & Random Buttons */}
+      <div className="absolute top-4 right-4 z-20 flex items-center gap-2">
+        {hasCreators && (
+          <Link href="/api/random-creator" className="inline-flex items-center justify-center bg-zinc-900 hover:bg-zinc-800 text-white w-9 h-9 rounded-full text-sm font-semibold transition-all border border-zinc-800" title="Random Creator">
+            <Dices className="w-4 h-4" />
+          </Link>
+        )}
+        <Link href="/explore" className="inline-flex items-center gap-2 bg-zinc-900 hover:bg-zinc-800 text-white px-4 py-2 rounded-full text-sm font-semibold transition-all border border-zinc-800">
+          <Users className="w-4 h-4" />
+          Explore
+        </Link>
+      </div>
+
       {/* Hero Section */}
       <div className="relative isolate overflow-hidden">
         <div className="mx-auto max-w-7xl px-6 pb-24 pt-10 sm:pb-32 lg:flex lg:px-8 lg:py-40">
@@ -32,12 +54,20 @@ export default async function Home() {
             </p>
             <div className="mt-10 flex flex-col sm:flex-row items-start sm:items-center gap-4">
               {session ? (
-                <Link
-                  href="/dashboard"
-                  className="px-8 py-3 text-sm font-bold text-black bg-white border border-white hover:bg-zinc-200 transition-colors rounded-full"
-                >
-                  Go to Dashboard
-                </Link>
+                <>
+                  <Link
+                    href="/dashboard"
+                    className="px-8 py-3 text-sm font-bold text-black bg-white border border-white hover:bg-zinc-200 transition-colors rounded-full"
+                  >
+                    Go to Dashboard
+                  </Link>
+                  <Link
+                    href="/explore"
+                    className="px-8 py-3 text-sm font-bold text-white border border-zinc-800 hover:border-white transition-colors rounded-full"
+                  >
+                    Explore Creators
+                  </Link>
+                </>
               ) : (
                 <>
                   <Link
@@ -52,6 +82,12 @@ export default async function Home() {
                   >
                     Login
                   </Link>
+                    <Link
+                      href="/explore"
+                      className="px-8 py-3 text-sm font-bold text-zinc-400 hover:text-white transition-colors"
+                    >
+                      Explore Creators →
+                    </Link>
                 </>
               )}
             </div>
@@ -163,7 +199,10 @@ export default async function Home() {
       <footer className="border-t border-zinc-800 py-12">
         <div className="mx-auto max-w-7xl px-6 lg:px-8 flex flex-col items-center">
           <span className="text-xl font-bold text-white tracking-widest uppercase mb-4">QAmii</span>
-          <p className="text-zinc-500 text-sm">Empowering creators to monetize their knowledge.</p>
+          <p className="text-zinc-500 text-sm mb-4">Empowering creators to monetize their knowledge.</p>
+          <Link href="/explore" className="text-zinc-400 hover:text-white text-sm font-semibold transition-colors">
+            Explore Creators
+          </Link>
         </div>
       </footer>
     </div>
