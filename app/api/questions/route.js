@@ -53,37 +53,47 @@ export async function POST(req) {
       status: 'pending',
     });
 
-    // Initialize MP SDK with PLATFORM access token (to create preference on behalf of creator)
+    // Initialize MP SDK with creator's OAuth access token
     const client = new MercadoPagoConfig({ accessToken: creator.mercadopago.access_token });
 
     const preferenceClient = new Preference(client);
 
-    const preference = await preferenceClient.create({
-      body: {
-        items: [
-          {
-            id: question._id.toString(),
-            title: `Question for @${creator.username}`,
-            unit_price: Number(amount),
-            currency_id: currency, // Tells MP which currency to charge in
-            quantity: 1,
-            picture_url: avatarFullUrl,
-          }
-        ],
-        metadata: {
-          question_id: question._id.toString(),
-        },
-        marketplace_fee: platformFee, // QAmii platform commission
-        statement_descriptor: "QAmii", // How it appears on the credit card / MP statement
-        back_urls: {
-          success: `${process.env.APP_URL}/${creator.username}?success=true`,
-          failure: `${process.env.APP_URL}/${creator.username}?canceled=true`,
-          pending: `${process.env.APP_URL}/${creator.username}?pending=true`,
-        },
-        auto_return: "approved",
-        notification_url: `${process.env.APP_URL}/api/mp/webhook`,
-      }
-    });
+    const preferenceBody = {
+      items: [
+        {
+          id: question._id.toString(),
+          title: `Question for @${creator.username}`,
+          unit_price: Number(amount),
+          currency_id: currency, // Tells MP which currency to charge in
+          quantity: 1,
+          picture_url: avatarFullUrl,
+        }
+      ],
+      metadata: {
+        question_id: question._id.toString(),
+      },
+      statement_descriptor: "QAmii", // How it appears on the credit card / MP statement
+      back_urls: {
+        success: `${process.env.APP_URL}/${creator.username}?success=true`,
+        failure: `${process.env.APP_URL}/${creator.username}?canceled=true`,
+        pending: `${process.env.APP_URL}/${creator.username}?pending=true`,
+      },
+      auto_return: "approved",
+      notification_url: `${process.env.APP_URL}/api/mp/webhook`,
+    };
+
+    let preference;
+    try {
+      // Try with marketplace_fee first (works when platform app is registered in seller's country)
+      preference = await preferenceClient.create({
+        body: { ...preferenceBody, marketplace_fee: platformFee }
+      });
+    } catch (mpError) {
+      // marketplace_fee may fail for sellers in countries where the platform app isn't registered
+      // as a marketplace. Retry without it — fee is still tracked in our DB.
+      console.warn("marketplace_fee failed, retrying without it:", mpError.message || mpError);
+      preference = await preferenceClient.create({ body: preferenceBody });
+    }
 
     return NextResponse.json({ init_point: preference.init_point }, { status: 200 });
 
