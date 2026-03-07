@@ -1,3 +1,8 @@
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/app/api/auth/[...nextauth]/route";
+import connectToDatabase from "@/lib/db";
+import User from "@/models/User";
+import { NextResponse } from "next/server";
 import { SUPPORTED_CURRENCIES } from "@/lib/constants";
 
 export async function PUT(req) {
