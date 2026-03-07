@@ -10,6 +10,7 @@ export const metadata = {
   description: "Discover creators on QAmii and ask them anonymous questions.",
 };
 
+export const dynamic = "force-dynamic";
 export default async function ExplorePage({ searchParams }) {
   await connectToDatabase();
 
