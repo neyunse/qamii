@@ -53,13 +53,13 @@ export async function POST(req) {
       status: 'pending',
     });
 
-    // Use the seller's OAuth access token to create the preference.
-    // Checkout Pro requires the seller's token — collector_id is not valid for Preferences API.
-    // marketplace_fee is omitted to avoid cross-country checkout crashes.
-    // The platform fee is tracked in QAmii's database (feeAmount field).
     const client = new MercadoPagoConfig({ accessToken: creator.mercadopago.access_token });
-
     const preferenceClient = new Preference(client);
+
+    // Argentina (ARS) gets full marketplace features: marketplace_fee, currency_id, etc.
+    // Other countries use a minimal preference to avoid cross-country checkout crashes.
+    // Fee is always tracked in QAmii's database regardless.
+    const isArgentina = currency === "ARS";
 
     const item = {
       id: question._id.toString(),
@@ -67,6 +67,10 @@ export async function POST(req) {
       unit_price: Number(amount),
       quantity: 1,
     };
+
+    if (isArgentina) {
+      item.currency_id = "ARS";
+    }
 
     if (avatarFullUrl) {
       item.picture_url = avatarFullUrl;
@@ -85,6 +89,12 @@ export async function POST(req) {
       auto_return: "approved",
       notification_url: `${process.env.APP_URL}/api/mp/webhook`,
     };
+
+    // Only add marketplace features for Argentina where the app is registered
+    if (isArgentina) {
+      preferenceBody.marketplace_fee = platformFee;
+      preferenceBody.statement_descriptor = "QAmii";
+    }
 
     const preference = await preferenceClient.create({ body: preferenceBody });
 
