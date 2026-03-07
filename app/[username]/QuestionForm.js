@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { Loader2 } from "lucide-react";
+import { CURRENCY_MAP } from "@/lib/constants";
 
 export default function QuestionForm({ username, currency = "ARS", minAmount = 500 }) {
   const [content, setContent] = useState("");
@@ -10,7 +11,9 @@ export default function QuestionForm({ username, currency = "ARS", minAmount = 5
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
+  const currencyConfig = CURRENCY_MAP[currency] || { symbol: "$", step: 10 };
   const step = ["ARS", "CLP", "COP", "UYU"].includes(currency) ? 100 : 10;
+  const symbol = currencyConfig.symbol;
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -76,10 +79,10 @@ export default function QuestionForm({ username, currency = "ARS", minAmount = 5
 
       <div>
         <label className="block text-sm font-bold leading-6 text-zinc-200 mb-2">
-          Support Amount (Min ${minAmount} {currency})
+          Support Amount (Min {symbol}{minAmount} {currency})
         </label>
         <div className="relative rounded-xl border border-zinc-800 bg-black flex items-center px-5 py-2 focus-within:border-zinc-500 transition-colors">
-          <span className="text-zinc-500 font-bold text-lg mr-2 whitespace-nowrap">{currency} $</span>
+          <span className="text-zinc-500 font-bold text-lg mr-2 whitespace-nowrap">{currency} {symbol}</span>
           <input
             type="number"
             required
@@ -109,7 +112,7 @@ export default function QuestionForm({ username, currency = "ARS", minAmount = 5
         disabled={loading || content.length < 5 || amount < minAmount}
         className="mt-8 flex w-full items-center justify-center rounded-xl bg-zinc-500 px-6 py-4 text-base font-bold text-black border-2 border-transparent hover:bg-zinc-400 disabled:opacity-50 transition-colors"
       >
-        {loading ? <Loader2 className="w-6 h-6 animate-spin" /> : `Pay $${amount} & Ask`}
+        {loading ? <Loader2 className="w-6 h-6 animate-spin" /> : `Pay ${symbol}${amount} & Ask`}
       </button>
 
       <div className="mt-4 flex items-center justify-center gap-1.5 text-xs font-semibold text-zinc-500 bg-zinc-900/50 py-3 rounded-xl border border-zinc-800">

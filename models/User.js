@@ -29,7 +29,11 @@ const UserSchema = new mongoose.Schema({
     bio: { type: String },
     avatarUrl: { type: String },
     platformFeePercentage: { type: Number, default: 10, min: 10, max: 50 },
-    currency: { type: String, default: "ARS" },
+    currency: {
+      type: String,
+      default: "ARS",
+      enum: ["ARS", "BRL", "CLP", "COP", "MXN", "PEN", "UYU"]
+    },
     minAmount: { type: Number, default: 500 },
   },
   integrations: {

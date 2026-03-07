@@ -6,6 +6,7 @@ import Question from "@/models/Question";
 import Link from "next/link";
 import { MessageSquare, ExternalLink } from "lucide-react";
 import ShareButton from "./ShareButton";
+import { CURRENCY_MAP } from "@/lib/constants";
 
 export default async function DashboardPage({ searchParams }) {
   const session = await getServerSession(authOptions);
@@ -17,7 +18,8 @@ export default async function DashboardPage({ searchParams }) {
   await connectToDatabase();
 
   const user = await User.findById(session.user.id);
-  const currency = user.profile?.currency || "ARS";
+  const currencyCode = user.profile?.currency || "ARS";
+  const currencySymbol = CURRENCY_MAP[currencyCode]?.symbol || "$";
 
   // Find all questions for this user that are paid or answered
   const questions = await Question.find({
@@ -41,15 +43,15 @@ export default async function DashboardPage({ searchParams }) {
         <div className="bg-black border border-zinc-800 rounded-xl p-6 relative overflow-hidden">
           <div className="absolute -inset-1 bg-gradient-to-b from-zinc-800 to-black opacity-20 blur-xl"></div>
           <h3 className="text-zinc-500 font-bold uppercase tracking-widest text-xs mb-2 relative">Net Earnings</h3>
-          <p className="text-3xl font-black text-white relative">{currency} ${netEarnings.toFixed(2)}</p>
+          <p className="text-3xl font-black text-white relative">{currencyCode} {currencySymbol}{netEarnings.toFixed(2)}</p>
         </div>
         <div className="bg-zinc-950 border border-zinc-900 rounded-xl p-6">
           <h3 className="text-zinc-600 font-bold uppercase tracking-widest text-xs mb-2">Total Gross</h3>
-          <p className="text-xl font-bold text-zinc-300">{currency} ${grossEarnings.toFixed(2)}</p>
+          <p className="text-xl font-bold text-zinc-300">{currencyCode} {currencySymbol}{grossEarnings.toFixed(2)}</p>
         </div>
         <div className="bg-zinc-950 border border-zinc-900 rounded-xl p-6">
           <h3 className="text-zinc-600 font-bold uppercase tracking-widest text-xs mb-2">Platform Fees</h3>
-          <p className="text-xl font-bold text-zinc-300">- {currency} ${totalFees.toFixed(2)}</p>
+          <p className="text-xl font-bold text-zinc-300">- {currencyCode} {currencySymbol}{totalFees.toFixed(2)}</p>
         </div>
       </div>
 
@@ -99,7 +101,7 @@ export default async function DashboardPage({ searchParams }) {
                       {q.status === 'answered' ? 'Answered' : 'Needs Answer'}
                     </span>
                     <div className="flex items-center gap-3">
-                      <span className="text-xs font-semibold text-zinc-400">+ {q.currency || "ARS"} {q.amount || q.priceARS}</span>
+                      <span className="text-xs font-semibold text-zinc-400">+ {q.currency || "ARS"} {CURRENCY_MAP[q.currency || "ARS"]?.symbol || "$"}{q.amount || q.priceARS}</span>
                       <ShareButton url={`${publicUrl}/q/${q._id.toString()}`} />
                     </div>
                   </div>

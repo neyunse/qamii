@@ -24,6 +24,7 @@ const QuestionSchema = new mongoose.Schema({
     type: String,
     required: true,
     default: "ARS",
+    enum: ["ARS", "BRL", "CLP", "COP", "MXN", "PEN", "UYU"]
   },
   platformFeePercentage: {
     type: Number,

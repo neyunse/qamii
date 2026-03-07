@@ -4,6 +4,7 @@ import { useState } from "react";
 import { Loader2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { getImageUrl } from "@/lib/r2";
+import { CURRENCY_MAP } from "@/lib/constants";
 
 export default function SettingsForm({ initialData }) {
   const router = useRouter();
@@ -172,13 +173,11 @@ export default function SettingsForm({ initialData }) {
               onChange={(e) => setCurrency(e.target.value)}
               className="block w-full border border-zinc-800 bg-zinc-900 py-4 text-white font-bold focus:ring-0 focus:outline-none focus:border-white transition-colors rounded-md sm:text-lg px-4 cursor-pointer appearance-none"
             >
-              <option value="ARS">ARS (Argentine Peso)</option>
-              <option value="BRL">BRL (Brazilian Real)</option>
-              <option value="CLP">CLP (Chilean Peso)</option>
-              <option value="COP">COP (Colombian Peso)</option>
-              <option value="MXN">MXN (Mexican Peso)</option>
-              <option value="PEN">PEN (Peruvian Sol)</option>
-              <option value="UYU">UYU (Uruguayan Peso)</option>
+              {Object.entries(CURRENCY_MAP).map(([code, { name }]) => (
+                <option key={code} value={code}>
+                  {code} ({name})
+                </option>
+              ))}
             </select>
           </div>
         </div>

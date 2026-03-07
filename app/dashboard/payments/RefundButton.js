@@ -5,6 +5,7 @@ import { Loader2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import ConfirmModal from "@/components/ui/ConfirmModal";
+import { CURRENCY_MAP } from "@/lib/constants";
 
 export default function RefundButton({ questionId, paymentId, amount, currency }) {
   const [loading, setLoading] = useState(false);

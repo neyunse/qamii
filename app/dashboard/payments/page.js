@@ -6,6 +6,7 @@ import Question from "@/models/Question";
 import { redirect } from "next/navigation";
 import { Receipt, ArrowDownLeft, ArrowUpRight } from "lucide-react";
 import RefundButton from "./RefundButton";
+import { CURRENCY_MAP } from "@/lib/constants";
 
 export default async function PaymentsPage() {
   const session = await getServerSession(authOptions);
@@ -89,7 +90,7 @@ export default async function PaymentsPage() {
                       <td className="px-4 py-4 whitespace-nowrap">
                         <div className={`flex items-center gap-1.5 text-sm font-bold ${isRefunded ? 'text-zinc-500 line-through' : 'text-emerald-400'}`}>
                           {isRefunded ? <ArrowUpRight className="w-3.5 h-3.5" /> : <ArrowDownLeft className="w-3.5 h-3.5" />}
-                          {itemCurrency} ${amount.toFixed(2)}
+                          {itemCurrency} {CURRENCY_MAP[itemCurrency]?.symbol || "$"}{amount.toFixed(2)}
                         </div>
                       </td>
                       <td className="px-4 py-4 whitespace-nowrap">

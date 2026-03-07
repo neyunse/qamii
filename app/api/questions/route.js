@@ -3,13 +3,15 @@ import { MercadoPagoConfig, Preference } from "mercadopago";
 import connectToDatabase from "@/lib/db";
 import User from "@/models/User";
 import Question from "@/models/Question";
+import { SUPPORTED_CURRENCIES } from "@/lib/constants";
+import { getImageUrl } from "@/lib/r2";
 
 export async function POST(req) {
   try {
     const { username, content, amount, currency } = await req.json();
 
-    if (!username || !content || !amount || amount < 1 || !currency) {
-      return NextResponse.json({ message: "Invalid request data" }, { status: 400 });
+    if (!username || !content || !amount || amount < 1 || !currency || !SUPPORTED_CURRENCIES.includes(currency)) {
+      return NextResponse.json({ message: "Invalid request data or unsupported currency" }, { status: 400 });
     }
 
     await connectToDatabase();
@@ -22,6 +24,17 @@ export async function POST(req) {
 
     if (!creator.mercadopago?.access_token) {
       return NextResponse.json({ message: "Creator is not accepting payments yet" }, { status: 400 });
+    }
+
+    // Get absolute avatar URL if exists
+    let avatarFullUrl = null;
+    if (creator.profile?.avatarUrl) {
+      const relativePath = getImageUrl(creator.profile.avatarUrl);
+      if (relativePath) {
+        avatarFullUrl = relativePath.startsWith('http')
+          ? relativePath
+          : `${process.env.APP_URL || process.env.NEXT_PUBLIC_BASE_URL}${relativePath}`;
+      }
     }
 
     // Calculate dynamic platform fee (default 10%)
@@ -53,6 +66,7 @@ export async function POST(req) {
             unit_price: Number(amount),
             currency_id: currency, // Tells MP which currency to charge in
             quantity: 1,
+            picture_url: avatarFullUrl,
           }
         ],
         metadata: {

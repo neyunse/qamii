@@ -1,8 +1,4 @@
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/app/api/auth/[...nextauth]/route";
-import connectToDatabase from "@/lib/db";
-import User from "@/models/User";
-import { NextResponse } from "next/server";
+import { SUPPORTED_CURRENCIES } from "@/lib/constants";
 
 export async function PUT(req) {
   try {
@@ -13,6 +9,10 @@ export async function PUT(req) {
     }
 
     const { displayName, bio, platformFeePercentage, currency, minAmount } = await req.json();
+
+    if (currency && !SUPPORTED_CURRENCIES.includes(currency)) {
+      return NextResponse.json({ message: "Unsupported currency" }, { status: 400 });
+    }
 
     const finalFee = Math.min(50, Math.max(10, Number(platformFeePercentage) || 10));
     const finalMinAmount = Math.max(1, Number(minAmount) || 500);

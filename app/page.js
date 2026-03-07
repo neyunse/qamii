@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
+import { CURRENCY_MAP } from "@/lib/constants";
 
 export default async function Home() {
   const session = await getServerSession(authOptions);
@@ -145,7 +146,7 @@ export default async function Home() {
             <h3 className="text-xl font-bold text-white mb-3">How do creators get paid?</h3>
             <p className="text-zinc-400 leading-relaxed">
               Payments are processed securely via MercadoPago. The money is transferred directly into the creator's MercadoPago account the moment a fan pays. QAmii only retains a platform fee (minimum 10% to run the servers) that the creator can customize. <br /><br />
-              <strong>Supported Creator Countries:</strong> Argentina, Brazil, Chile, Colombia, Mexico, Peru, and Uruguay. Fans can pay from anywhere using enabled local payment methods.
+              <strong>Supported Creator Countries:</strong> {Object.values(CURRENCY_MAP).map(c => c.name).join(', ')}. Fans can pay from anywhere using enabled local payment methods.
             </p>
           </div>
           <div className="bg-[#0f0f0f] border border-zinc-800 rounded-3xl p-8">
