@@ -58,21 +58,26 @@ export async function POST(req) {
 
     const preferenceClient = new Preference(client);
 
+    const item = {
+      id: question._id.toString(),
+      title: `Question for @${creator.username}`,
+      unit_price: Number(amount),
+      quantity: 1,
+      // Do NOT send currency_id — MercadoPago determines the currency
+      // from the seller's access token country. Sending a mismatched
+      // currency_id (e.g. ARS for a Mexican seller) breaks the checkout.
+    };
+
+    if (avatarFullUrl) {
+      item.picture_url = avatarFullUrl;
+    }
+
     const preferenceBody = {
-      items: [
-        {
-          id: question._id.toString(),
-          title: `Question for @${creator.username}`,
-          unit_price: Number(amount),
-          currency_id: currency, // Tells MP which currency to charge in
-          quantity: 1,
-          picture_url: avatarFullUrl,
-        }
-      ],
+      items: [item],
       metadata: {
         question_id: question._id.toString(),
       },
-      statement_descriptor: "QAmii", // How it appears on the credit card / MP statement
+      statement_descriptor: "QAmii",
       back_urls: {
         success: `${process.env.APP_URL}/${creator.username}?success=true`,
         failure: `${process.env.APP_URL}/${creator.username}?canceled=true`,
